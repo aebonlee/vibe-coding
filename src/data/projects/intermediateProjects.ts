@@ -1,0 +1,63 @@
+import type { ProjectData } from '../../types';
+
+export const intermediateProjects: ProjectData[] = [
+  {
+    id: 'fullstack-crud',
+    slug: 'fullstack-crud',
+    title: '풀스택 CRUD 앱',
+    description: 'React + Supabase로 인증, RLS, CRUD를 갖춘 풀스택 앱.',
+    level: 'intermediate',
+    duration: '5-6시간',
+    techStack: ['React', 'Supabase', 'Cursor', 'TypeScript'],
+    outcomes: ['Supabase Auth 구현', 'RLS 정책 설정', '풀스택 CRUD'],
+    steps: [
+      { step: 1, title: 'Supabase 프로젝트 설정', description: 'Supabase 프로젝트를 생성하고 테이블을 만듭니다.', content: 'Supabase 대시보드에서 새 프로젝트를 생성합니다. posts 테이블을 만들고 id, title, content, user_id, created_at 컬럼을 추가합니다.' },
+      { step: 2, title: 'React 프로젝트 초기화', description: 'Cursor에서 React + TypeScript 프로젝트를 생성합니다.', content: 'Cursor를 열고 프롬프트: "React + TypeScript + Supabase 프로젝트를 초기화해주세요. supabase-js 클라이언트 설정도 포함해주세요."' },
+      { step: 3, title: '인증 구현', description: '로그인/회원가입 기능을 만듭니다.', content: 'Supabase Auth를 활용하여 이메일/비밀번호 로그인과 Google OAuth를 구현합니다.' },
+      { step: 4, title: 'CRUD 기능', description: '게시글 작성, 조회, 수정, 삭제를 구현합니다.', content: 'Supabase 클라이언트를 사용하여 posts 테이블에 대한 CRUD 작업을 구현합니다.' },
+      { step: 5, title: 'RLS 정책 설정', description: 'Row Level Security로 데이터 접근을 제어합니다.', content: '본인의 게시글만 수정/삭제할 수 있도록 RLS 정책을 설정합니다.' },
+      { step: 6, title: '리스트 & 상세 페이지', description: '게시글 목록과 상세 페이지를 만듭니다.', content: 'React Router를 사용하여 목록 페이지와 상세 페이지를 구현합니다.' },
+      { step: 7, title: '페이지네이션', description: '게시글 목록에 페이지네이션을 추가합니다.', content: 'Supabase의 range() 쿼리를 활용하여 페이지네이션을 구현합니다.' },
+      { step: 8, title: '배포', description: 'Vercel/Netlify로 배포합니다.', content: '환경 변수를 설정하고 빌드 후 배포합니다.' },
+    ]
+  },
+  {
+    id: 'api-dashboard',
+    slug: 'api-dashboard',
+    title: 'API 대시보드',
+    description: '외부 API를 연동하여 데이터를 시각화하는 대시보드.',
+    level: 'intermediate',
+    duration: '5-6시간',
+    techStack: ['React', 'Cursor', 'Chart.js', 'REST API'],
+    outcomes: ['API 연동', '데이터 시각화', '대시보드 레이아웃'],
+    steps: [
+      { step: 1, title: '대시보드 설계', description: '표시할 데이터와 레이아웃을 기획합니다.', content: '날씨 API, 환율 API 등 공개 API를 선택하고 대시보드 레이아웃을 설계합니다.' },
+      { step: 2, title: 'API 연동', description: '외부 API를 호출하고 데이터를 가져옵니다.', content: 'fetch/axios로 API를 호출하고, 커스텀 훅으로 데이터 페칭 로직을 관리합니다.' },
+      { step: 3, title: '카드 위젯', description: '핵심 지표를 카드로 표시합니다.', content: '주요 숫자를 큰 글자로 표시하는 KPI 카드를 만듭니다.' },
+      { step: 4, title: '차트 구현', description: 'Chart.js로 데이터를 시각화합니다.', content: '라인 차트, 바 차트, 파이 차트를 활용하여 데이터를 시각적으로 표현합니다.' },
+      { step: 5, title: '필터 & 기간 선택', description: '데이터 필터링 기능을 추가합니다.', content: '날짜 범위 선택, 카테고리 필터 등을 추가합니다.' },
+      { step: 6, title: '자동 갱신', description: '주기적으로 데이터를 새로고침합니다.', content: 'setInterval 또는 React Query를 활용하여 자동 갱신을 구현합니다.' },
+      { step: 7, title: '반응형 & 완성', description: '모바일에서도 잘 보이도록 합니다.', content: '그리드 레이아웃을 반응형으로 만들고 최종 점검합니다.' },
+    ]
+  },
+  {
+    id: 'realtime-chat',
+    slug: 'realtime-chat',
+    title: '실시간 채팅 앱',
+    description: 'Supabase Realtime을 활용한 실시간 채팅 앱.',
+    level: 'intermediate',
+    duration: '6-7시간',
+    techStack: ['React', 'Supabase Realtime', 'Cursor', 'TypeScript'],
+    outcomes: ['실시간 데이터 동기화', '채널 시스템', '메시지 관리'],
+    steps: [
+      { step: 1, title: 'DB 설계', description: '채팅 테이블을 설계합니다.', content: 'channels, messages 테이블을 만들고 관계를 설정합니다.' },
+      { step: 2, title: '인증 설정', description: 'Supabase Auth로 사용자 인증을 구현합니다.', content: '로그인/회원가입 페이지를 만들고 AuthContext를 설정합니다.' },
+      { step: 3, title: '채널 목록', description: '채팅 채널 목록을 표시합니다.', content: '채널 생성, 목록 조회, 채널 선택 기능을 구현합니다.' },
+      { step: 4, title: '메시지 표시', description: '선택한 채널의 메시지를 표시합니다.', content: '메시지를 시간순으로 표시하고, 내 메시지와 상대 메시지를 구분합니다.' },
+      { step: 5, title: '실시간 구독', description: 'Supabase Realtime으로 실시간 메시지를 수신합니다.', content: 'supabase.channel().on() 을 사용하여 실시간 메시지 수신을 구현합니다.' },
+      { step: 6, title: '메시지 전송', description: '메시지 입력과 전송 기능을 만듭니다.', content: '입력 폼과 전송 버튼, Enter 키 전송, 자동 스크롤을 구현합니다.' },
+      { step: 7, title: '온라인 표시', description: '접속 중인 사용자를 표시합니다.', content: 'Supabase Presence를 활용하여 온라인 사용자 목록을 표시합니다.' },
+      { step: 8, title: '마무리', description: '알림, 이모지, 스타일링을 추가합니다.', content: '읽지 않은 메시지 카운트, 이모지 리액션, 반응형 디자인을 완성합니다.' },
+    ]
+  }
+];
