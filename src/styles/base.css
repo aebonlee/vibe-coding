@@ -111,6 +111,7 @@ html[data-color="orange"] {
 
 .app-main {
     flex: 1 0 auto;
+    padding-top: var(--nav-height);
 }
 
 .footer {
