@@ -1,6 +1,6 @@
 /* ============================================
    Vibe Coding Master - Base Styles
-   Purple Theme (#7C3AED)
+   Royal Blue Theme (#0046C8)
    ============================================ */
 
 * {
@@ -10,9 +10,9 @@
 }
 
 :root {
-    --primary-blue: #7C3AED;
-    --primary-blue-dark: #5B21B6;
-    --primary-blue-light: #A78BFA;
+    --primary-blue: #0046C8;
+    --primary-blue-dark: #002E8A;
+    --primary-blue-light: #4A8FE7;
     --bg-white: #FFFFFF;
     --bg-light-gray: #F5F7FA;
     --bg-medium-gray: #E8EDF2;
@@ -31,13 +31,13 @@
     --container-max: 1280px;
 
     /* Gradient */
-    --primary-gradient: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
-    --accent-gradient: linear-gradient(135deg, #5B21B6 0%, #7C3AED 50%, #A78BFA 100%);
+    --primary-gradient: linear-gradient(135deg, #0046C8 0%, #4A8FE7 100%);
+    --accent-gradient: linear-gradient(135deg, #002E8A 0%, #0046C8 50%, #4A8FE7 100%);
 
     /* Hero / CTA / Page-header shared background */
-    --hero-bg: linear-gradient(135deg, #7C3AED 0%, #5B21B6 50%, #3B1A7E 100%);
-    --hero-bg-dark: linear-gradient(135deg, #4C1D95 0%, #3B1A7E 50%, #2E1065 100%);
-    --highlight-gradient: linear-gradient(135deg, #C4B5FD 0%, #DDD6FE 50%, #FFFFFF 100%);
+    --hero-bg: linear-gradient(135deg, #0046C8 0%, #002E8A 50%, #1E3A5F 100%);
+    --hero-bg-dark: linear-gradient(135deg, #0A2D6E 0%, #122870 50%, #172D58 100%);
+    --highlight-gradient: linear-gradient(135deg, #93C5FD 0%, #BFDBFE 50%, #FFFFFF 100%);
 
     /* Glassmorphism */
     --glass-bg: rgba(255, 255, 255, 0.85);
@@ -56,17 +56,17 @@
 }
 
 /* ── Color Theme Overrides ── */
-/* Purple is the default (no override needed) */
+/* Royal Blue is the default (no override needed) */
 
-html[data-color="blue"] {
-    --primary-blue: #0046C8;
-    --primary-blue-dark: #002E8A;
-    --primary-blue-light: #4A8FE7;
-    --primary-gradient: linear-gradient(135deg, #0046C8 0%, #4A8FE7 100%);
-    --accent-gradient: linear-gradient(135deg, #002E8A 0%, #0046C8 50%, #4A8FE7 100%);
-    --hero-bg: linear-gradient(135deg, #0046C8 0%, #002E8A 50%, #1E3A5F 100%);
-    --hero-bg-dark: linear-gradient(135deg, #0A2D6E 0%, #122870 50%, #172D58 100%);
-    --highlight-gradient: linear-gradient(135deg, #93C5FD 0%, #BFDBFE 50%, #FFFFFF 100%);
+html[data-color="purple"] {
+    --primary-blue: #7C3AED;
+    --primary-blue-dark: #5B21B6;
+    --primary-blue-light: #A78BFA;
+    --primary-gradient: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+    --accent-gradient: linear-gradient(135deg, #5B21B6 0%, #7C3AED 50%, #A78BFA 100%);
+    --hero-bg: linear-gradient(135deg, #7C3AED 0%, #5B21B6 50%, #3B1A7E 100%);
+    --hero-bg-dark: linear-gradient(135deg, #4C1D95 0%, #3B1A7E 50%, #2E1065 100%);
+    --highlight-gradient: linear-gradient(135deg, #C4B5FD 0%, #DDD6FE 50%, #FFFFFF 100%);
 }
 
 html[data-color="red"] {
@@ -100,6 +100,21 @@ html[data-color="orange"] {
     --hero-bg: linear-gradient(135deg, #C87200 0%, #8A4F00 50%, #5F3A1E 100%);
     --hero-bg-dark: linear-gradient(135deg, #6E4014 0%, #704010 50%, #583018 100%);
     --highlight-gradient: linear-gradient(135deg, #FDCF93 0%, #FDE4BF 50%, #FFFFFF 100%);
+}
+
+/* App layout — sticky footer */
+.app-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.app-main {
+    flex: 1 0 auto;
+}
+
+.footer {
+    flex-shrink: 0;
 }
 
 html {
@@ -180,7 +195,7 @@ img {
     border-color: var(--primary-blue-dark);
     color: var(--text-white);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 70, 200, 0.3);
 }
 
 .btn-secondary {
@@ -193,7 +208,7 @@ img {
     background: var(--primary-blue);
     color: var(--text-white);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 70, 200, 0.3);
 }
 
 .btn-outline {
@@ -206,7 +221,7 @@ img {
     background: var(--primary-blue);
     color: var(--text-white);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 70, 200, 0.3);
 }
 
 .btn-lg {

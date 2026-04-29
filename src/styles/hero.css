@@ -265,7 +265,7 @@
     width: 56px;
     height: 56px;
     border-radius: var(--radius-md);
-    background: rgba(124, 58, 237, 0.08);
+    background: rgba(0, 70, 200, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;

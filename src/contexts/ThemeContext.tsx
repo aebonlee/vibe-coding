@@ -48,7 +48,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps): ReactElement =>
 
   const [colorTheme, setColorTheme] = useState<ColorTheme>(() => {
     const saved = getCookie('colorTheme');
-    return (COLOR_THEMES as string[]).includes(saved ?? '') ? (saved as ColorTheme) : 'purple';
+    return (COLOR_THEMES as string[]).includes(saved ?? '') ? (saved as ColorTheme) : 'blue';
   });
 
   useEffect(() => {

@@ -26,7 +26,7 @@ const site: SiteConfig = {
     ]
   },
 
-  themeColor: '#7C3AED',
+  themeColor: '#0046C8',
 
   company: {
     name: '드림아이티비즈(DreamIT Biz)',
@@ -58,7 +58,7 @@ const site: SiteConfig = {
   ],
 
   menuItems: [
-    { path: '/', labelKey: 'nav.home' },
+    { path: '/about', labelKey: 'nav.about', activePath: '/about' },
     {
       labelKey: 'nav.curriculum',
       path: '/curriculum/beginner',
@@ -86,7 +86,7 @@ const site: SiteConfig = {
   ],
 
   footerLinks: [
-    { path: '/', labelKey: 'nav.home' },
+    { path: '/about', labelKey: 'nav.about' },
     { path: '/curriculum/beginner', labelKey: 'nav.curriculum' },
     { path: '/projects', labelKey: 'nav.projects' },
     { path: '/bootcamp', labelKey: 'nav.bootcamp' },

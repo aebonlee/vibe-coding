@@ -6,6 +6,7 @@ import Footer from '../components/layout/Footer';
 import site from '../config/site';
 
 const Home = lazy(() => import('../pages/Home'));
+const About = lazy(() => import('../pages/About'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
 // Auth pages
@@ -48,12 +49,13 @@ const Loading = (): ReactElement => (
 
 const PublicLayout = (): ReactElement => {
   return (
-    <>
+    <div className="app-layout">
       <Navbar />
-      <main>
+      <main className="app-main">
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
 
             {site.features.auth && (
               <>
@@ -95,7 +97,7 @@ const PublicLayout = (): ReactElement => {
         </Suspense>
       </main>
       <Footer />
-    </>
+    </div>
   );
 };
 

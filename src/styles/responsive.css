@@ -124,6 +124,14 @@
     .footer-info {
         grid-template-columns: 1fr 1fr;
     }
+
+    .about-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .about-audience {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
@@ -208,6 +216,22 @@
 
     .tool-cards-grid {
         grid-template-columns: 1fr;
+    }
+
+    .about-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .about-audience {
+        grid-template-columns: 1fr;
+    }
+
+    .about-section h2 {
+        font-size: 22px;
+    }
+
+    .about-cta h2 {
+        font-size: 24px;
     }
 
     /* Board */

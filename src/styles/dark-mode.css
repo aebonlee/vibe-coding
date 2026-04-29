@@ -1,6 +1,6 @@
 /* ============================================
    Dark Mode Overrides
-   Vibe Coding Master — Purple Theme
+   Vibe Coding Master — Royal Blue Theme
    ============================================ */
 
 [data-theme="dark"] {
@@ -14,11 +14,11 @@
     --border-medium: #4B5563;
     --glass-bg: rgba(17, 24, 39, 0.85);
     --glass-border: rgba(255, 255, 255, 0.08);
-    /* Brighter purple for dark backgrounds */
-    --primary-blue: #A78BFA;
-    --primary-blue-dark: #7C3AED;
-    --primary-blue-light: #C4B5FD;
-    --primary-gradient: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+    /* Brighter blue for dark backgrounds */
+    --primary-blue: #4A8FE7;
+    --primary-blue-dark: #2B6CC4;
+    --primary-blue-light: #93C5FD;
+    --primary-gradient: linear-gradient(135deg, #1A5AC8 0%, #4A8FE7 100%);
 }
 
 [data-theme="dark"] .hero,
@@ -27,11 +27,11 @@
 }
 
 /* ── Dark mode color theme overrides ── */
-[data-theme="dark"][data-color="blue"] {
-    --primary-blue: #4A8FE7;
-    --primary-blue-dark: #2B6CC4;
-    --primary-blue-light: #93C5FD;
-    --primary-gradient: linear-gradient(135deg, #1A5AC8 0%, #4A8FE7 100%);
+[data-theme="dark"][data-color="purple"] {
+    --primary-blue: #A78BFA;
+    --primary-blue-dark: #7C3AED;
+    --primary-blue-light: #C4B5FD;
+    --primary-gradient: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
 }
 
 [data-theme="dark"][data-color="red"] {
@@ -57,7 +57,7 @@
 
 /* ── Particles ── */
 [data-theme="dark"] .particle {
-    background: rgba(167, 139, 250, 0.25);
+    background: rgba(74, 143, 231, 0.25);
 }
 
 /* ── Page header ── */
@@ -95,7 +95,7 @@
 }
 
 [data-theme="dark"] .dropdown-menu li a:hover {
-    background: rgba(167, 139, 250, 0.1);
+    background: rgba(74, 143, 231, 0.1);
 }
 
 /* ── User Dropdown dark mode ── */
@@ -127,7 +127,7 @@
 }
 
 [data-theme="dark"] .dropdown-menu-item:hover {
-    background: rgba(167, 139, 250, 0.12);
+    background: rgba(74, 143, 231, 0.12);
     color: var(--primary-blue-light);
 }
 
@@ -211,7 +211,7 @@
 }
 
 [data-theme="dark"] .feature-icon {
-    background: rgba(167, 139, 250, 0.15);
+    background: rgba(74, 143, 231, 0.15);
 }
 
 [data-theme="dark"] .feature-card:hover .feature-icon {
@@ -260,11 +260,11 @@
 }
 
 [data-theme="dark"] .search-result-item:hover {
-    background: rgba(167, 139, 250, 0.1);
+    background: rgba(74, 143, 231, 0.1);
 }
 
 [data-theme="dark"] .search-result-type {
-    background: rgba(167, 139, 250, 0.15);
+    background: rgba(74, 143, 231, 0.15);
 }
 
 /* ── Community dark mode ── */
@@ -357,12 +357,12 @@
 }
 
 [data-theme="dark"] .sidebar-item:hover {
-    background: rgba(167, 139, 250, 0.08);
+    background: rgba(74, 143, 231, 0.08);
     color: var(--primary-blue-light);
 }
 
 [data-theme="dark"] .sidebar-item.active {
-    background: rgba(167, 139, 250, 0.12);
+    background: rgba(74, 143, 231, 0.12);
     color: var(--primary-blue-light);
     border-left-color: var(--primary-blue-light);
 }
@@ -387,8 +387,8 @@
 }
 
 [data-theme="dark"] .key-points {
-    background: rgba(167, 139, 250, 0.08);
-    border-color: rgba(167, 139, 250, 0.2);
+    background: rgba(74, 143, 231, 0.08);
+    border-color: rgba(74, 143, 231, 0.2);
 }
 
 [data-theme="dark"] .topic-complete-action .btn-completed {
@@ -432,7 +432,7 @@
 }
 
 [data-theme="dark"] .step-nav-item.active {
-    background: rgba(167, 139, 250, 0.12);
+    background: rgba(74, 143, 231, 0.12);
     color: var(--primary-blue-light);
     border-color: var(--primary-blue);
 }
@@ -468,7 +468,7 @@
 }
 
 [data-theme="dark"] .checklist-item.checked {
-    background: rgba(167, 139, 250, 0.08);
+    background: rgba(74, 143, 231, 0.08);
 }
 
 [data-theme="dark"] .checklist-progress-bar {
@@ -546,10 +546,28 @@
 }
 
 [data-theme="dark"] .admin-table tr:hover td {
-    background: rgba(167, 139, 250, 0.04);
+    background: rgba(74, 143, 231, 0.04);
 }
 
 [data-theme="dark"] .admin-section {
     background: #1F2937;
     border-color: #374151;
+}
+
+/* ── About page dark mode ── */
+[data-theme="dark"] .about-card {
+    background: var(--bg-light-gray);
+    border-color: var(--border-medium);
+}
+
+[data-theme="dark"] .about-card:hover {
+    border-color: var(--primary-blue);
+}
+
+[data-theme="dark"] .audience-item {
+    background: var(--bg-medium-gray);
+}
+
+[data-theme="dark"] .about-section {
+    border-color: var(--border-medium);
 }
