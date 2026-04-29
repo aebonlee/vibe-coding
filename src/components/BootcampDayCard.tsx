@@ -8,6 +8,21 @@ interface BootcampDayCardProps {
   isLoggedIn: boolean;
 }
 
+const getToolTagClass = (tool: string): string => {
+  const lower = tool.toLowerCase();
+  if (lower.includes('lovable')) return 'tool-tag-lovable';
+  if (lower.includes('bolt')) return 'tool-tag-bolt';
+  if (lower.includes('v0')) return 'tool-tag-v0';
+  if (lower.includes('cursor')) return 'tool-tag-cursor';
+  if (lower.includes('windsurf')) return 'tool-tag-windsurf';
+  if (lower.includes('claude')) return 'tool-tag-claude';
+  if (lower.includes('github') || lower.includes('copilot')) return 'tool-tag-github';
+  if (lower.includes('supabase')) return 'tool-tag-supabase';
+  if (lower.includes('배포') || lower.includes('deploy') || lower.includes('gh-pages')) return 'tool-tag-deploy';
+  if (lower.includes('react')) return 'tool-tag-react';
+  return '';
+};
+
 const BootcampDayCard = ({ day, isCompleted, onToggle, isLoggedIn }: BootcampDayCardProps): ReactElement => {
   return (
     <div className={`bootcamp-day-card ${isCompleted ? 'completed' : ''}`}>
@@ -35,7 +50,7 @@ const BootcampDayCard = ({ day, isCompleted, onToggle, isLoggedIn }: BootcampDay
       </div>
       <div className="bootcamp-day-tools">
         {day.tools.map((tool, i) => (
-          <span key={i} className="tech-tag">{tool}</span>
+          <span key={i} className={`tech-tag ${getToolTagClass(tool)}`}>{tool}</span>
         ))}
       </div>
       <div className="bootcamp-day-deliverable">
