@@ -1,4 +1,4 @@
-import{r as h,h as k,a as g,j as e}from"./index-Be6EJXfM.js";import{S as x}from"./SidebarLayout-GFJ2aYsn.js";import{C as b}from"./CodeBlock-DY9g0n_b.js";const r=[{id:"line-break",slug:"line-break",title:"줄바꿈과 문단",description:"마크다운에서 줄바꿈과 문단을 구분하는 방법",order:1,content:`마크다운에서 줄바꿈은 단순히 Enter를 누르는 것과 다릅니다. 줄 끝에 공백 2개를 넣거나, 빈 줄을 넣어 문단을 구분합니다.
+import{r as h,h as k,a as g,j as e}from"./index-BsaQD5Fj.js";import{S as x}from"./SidebarLayout-BAPpJ0gO.js";import{C as b}from"./CodeBlock-DVtXcYGf.js";const r=[{id:"line-break",slug:"line-break",title:"줄바꿈과 문단",description:"마크다운에서 줄바꿈과 문단을 구분하는 방법",order:1,content:`마크다운에서 줄바꿈은 단순히 Enter를 누르는 것과 다릅니다. 줄 끝에 공백 2개를 넣거나, 빈 줄을 넣어 문단을 구분합니다.
 
 **줄바꿈(Line Break)**: 줄 끝에 공백 2개 또는 \`<br>\` 태그
 **문단 구분(Paragraph)**: 빈 줄 하나 삽입
