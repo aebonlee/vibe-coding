@@ -1,7 +1,7 @@
 export const translations: Record<string, Record<string, unknown>> = {
   ko: {
     nav: {
-      about: '소개',
+      about: 'About',
       curriculum: '커리큘럼',
       beginner: '초급',
       intermediate: '중급',
