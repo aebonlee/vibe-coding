@@ -1,4 +1,4 @@
-import { useState, type ReactElement } from 'react';
+import { useState, useEffect, useRef, useCallback, type ReactElement } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import CodeBlock from '../components/CodeBlock';
 import LevelBadge from '../components/LevelBadge';
@@ -17,6 +17,37 @@ const ProjectDetail = (): ReactElement => {
   const [activeStep, setActiveStep] = useState(0);
   const { isCompleted, toggleComplete } = useProgress();
   const { isLoggedIn } = useAuth();
+  const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const isScrolling = useRef(false);
+
+  const handleIntersect = useCallback((entries: IntersectionObserverEntry[]) => {
+    if (isScrolling.current) return;
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        const idx = Number(entry.target.getAttribute('data-step-index'));
+        if (!isNaN(idx)) setActiveStep(idx);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!project) return;
+    const observer = new IntersectionObserver(handleIntersect, {
+      rootMargin: '-20% 0px -60% 0px',
+      threshold: 0,
+    });
+    stepRefs.current.forEach(el => { if (el) observer.observe(el); });
+    return () => observer.disconnect();
+  }, [project, handleIntersect]);
+
+  const scrollToStep = (index: number) => {
+    const el = stepRefs.current[index];
+    if (!el) return;
+    isScrolling.current = true;
+    setActiveStep(index);
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => { isScrolling.current = false; }, 800);
+  };
 
   if (!project) {
     return (
@@ -27,7 +58,6 @@ const ProjectDetail = (): ReactElement => {
     );
   }
 
-  const step = project.steps[activeStep];
   const progressId = `project-${project.id}`;
 
   return (
@@ -54,7 +84,7 @@ const ProjectDetail = (): ReactElement => {
               <button
                 key={i}
                 className={`step-nav-item ${activeStep === i ? 'active' : ''}`}
-                onClick={() => setActiveStep(i)}
+                onClick={() => scrollToStep(i)}
               >
                 <span className="step-number">{s.step}</span>
                 <span className="step-title">{s.title}</span>
@@ -63,8 +93,14 @@ const ProjectDetail = (): ReactElement => {
           </aside>
 
           <div className="project-step-content">
-            {step && (
-              <>
+            {project.steps.map((step, i) => (
+              <div
+                key={i}
+                ref={el => { stepRefs.current[i] = el; }}
+                data-step-index={i}
+                className="project-step-section"
+                id={`step-${i}`}
+              >
                 <div className="step-header">
                   <span className="step-badge">Step {step.step} / {project.steps.length}</span>
                   <h2>{step.title}</h2>
@@ -75,34 +111,17 @@ const ProjectDetail = (): ReactElement => {
                 {step.tips && step.tips.length > 0 && (
                   <div className="key-points">
                     <h4>팁</h4>
-                    <ul>{step.tips.map((tip, i) => <li key={i}>{tip}</li>)}</ul>
+                    <ul>{step.tips.map((tip, j) => <li key={j}>{tip}</li>)}</ul>
                   </div>
                 )}
 
-                {step.codeExamples && step.codeExamples.map((ex, i) => (
-                  <CodeBlock key={i} code={ex.code} language={ex.language} title={ex.title} />
+                {step.codeExamples && step.codeExamples.map((ex, j) => (
+                  <CodeBlock key={j} code={ex.code} language={ex.language} title={ex.title} />
                 ))}
+              </div>
+            ))}
 
-                <div className="step-navigation">
-                  <button
-                    className="btn btn-outline"
-                    disabled={activeStep === 0}
-                    onClick={() => setActiveStep(activeStep - 1)}
-                  >
-                    &larr; 이전
-                  </button>
-                  <button
-                    className="btn btn-outline"
-                    disabled={activeStep === project.steps.length - 1}
-                    onClick={() => setActiveStep(activeStep + 1)}
-                  >
-                    다음 &rarr;
-                  </button>
-                </div>
-              </>
-            )}
-
-            {isLoggedIn && activeStep === project.steps.length - 1 && (
+            {isLoggedIn && (
               <div className="topic-complete-action" style={{ marginTop: '2rem' }}>
                 <button
                   className={`btn ${isCompleted('project', progressId) ? 'btn-completed' : 'btn-primary'}`}

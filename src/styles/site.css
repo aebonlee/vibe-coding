@@ -14,8 +14,9 @@
     gap: 0;
     min-height: calc(100vh - var(--nav-height));
     position: relative;
-    margin-left: 0;
-    margin-right: 0;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 40px;
 }
 
 .sidebar {
@@ -169,7 +170,7 @@
 .sidebar-content {
     flex: 1;
     min-width: 0;
-    padding: 32px 40px;
+    padding: 32px 0 32px 40px;
 }
 
 /* ============================================
@@ -769,6 +770,78 @@
     font-weight: 700;
     color: var(--text-primary);
     margin: 24px 0 12px;
+}
+
+/* ── Project Step Section (one-page scroll) ── */
+.project-step-section {
+    padding: 32px 0;
+    border-bottom: 1px solid var(--border-light);
+    scroll-margin-top: calc(var(--nav-height) + 20px);
+}
+
+.project-step-section:last-of-type {
+    border-bottom: none;
+}
+
+.step-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(0, 70, 200, 0.08);
+    color: var(--primary-blue);
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+/* ── Project Outcomes ── */
+.project-outcomes {
+    margin: 48px 0;
+    padding: 32px;
+    background: rgba(0, 70, 200, 0.04);
+    border: 1px solid rgba(0, 70, 200, 0.12);
+    border-radius: var(--radius-lg);
+}
+
+.project-outcomes h3 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--primary-blue);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.project-outcomes h3::before {
+    content: '\1F3AF';
+    font-size: 22px;
+}
+
+.project-outcomes ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.project-outcomes li {
+    position: relative;
+    padding-left: 24px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+}
+
+.project-outcomes li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: #10B981;
+    font-weight: 700;
+    font-size: 16px;
 }
 
 /* ============================================

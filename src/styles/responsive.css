@@ -97,6 +97,10 @@
         padding: 0 24px;
     }
 
+    .sidebar-layout {
+        padding: 0 24px;
+    }
+
     .hero-title {
         font-size: 46px;
     }
@@ -300,6 +304,11 @@
         overflow-y: auto;
     }
 
+    /* Project outcomes */
+    .project-outcomes ul {
+        grid-template-columns: 1fr;
+    }
+
     /* Markdown split view */
     .markdown-split {
         flex-direction: column;
@@ -397,6 +406,10 @@
 
 @media (max-width: 480px) {
     .container {
+        padding: 0 16px;
+    }
+
+    .sidebar-layout {
         padding: 0 16px;
     }
 
