@@ -298,6 +298,7 @@
 
 .topic-section {
     margin-bottom: 36px;
+    scroll-margin-top: calc(var(--nav-height) + 20px);
 }
 
 .topic-section h3 {
@@ -1432,6 +1433,117 @@ a.bootcamp-day-card {
     gap: 6px;
 }
 
+/* ── Bootcamp Detail Body (sidebar + main) ── */
+.bootcamp-detail-body {
+    display: flex;
+    gap: 0;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+}
+
+.bootcamp-toc-mobile-toggle {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    background: var(--bg-white);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    margin-bottom: 16px;
+}
+
+.bootcamp-toc-mobile-toggle:hover {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+}
+
+.bootcamp-toc {
+    width: 240px;
+    min-width: 240px;
+    position: sticky;
+    top: var(--nav-height);
+    height: calc(100vh - var(--nav-height));
+    overflow-y: auto;
+    border-right: 1px solid var(--border-light);
+    padding-top: 8px;
+}
+
+.bootcamp-toc-header {
+    padding: 20px 16px 12px;
+}
+
+.bootcamp-toc-header h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.bootcamp-toc-nav {
+    padding: 0 0 24px;
+}
+
+.bootcamp-toc-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    transition: var(--transition-base);
+}
+
+.bootcamp-toc-item:hover {
+    color: var(--primary-blue);
+    background: rgba(0, 70, 200, 0.04);
+}
+
+.bootcamp-toc-item.active {
+    color: var(--primary-blue);
+    font-weight: 600;
+    background: rgba(0, 70, 200, 0.06);
+}
+
+.bootcamp-toc-dot {
+    display: block;
+    width: 6px;
+    height: 6px;
+    min-width: 6px;
+    border-radius: 50%;
+    background: var(--border-light);
+    margin-top: 6px;
+    transition: var(--transition-base);
+}
+
+.bootcamp-toc-item.active .bootcamp-toc-dot {
+    background: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(0, 70, 200, 0.15);
+}
+
+.bootcamp-toc-title {
+    flex: 1;
+    min-width: 0;
+}
+
+.bootcamp-detail-main {
+    flex: 1;
+    min-width: 0;
+    padding-left: 32px;
+}
+
 .bootcamp-detail-content {
     padding: 32px 0 16px;
 }
@@ -1441,6 +1553,7 @@ a.bootcamp-day-card {
     border-radius: var(--radius-lg);
     padding: 24px;
     margin: 24px 0;
+    scroll-margin-top: calc(var(--nav-height) + 20px);
 }
 
 .bootcamp-detail-tasks h3 {
@@ -1486,6 +1599,7 @@ a.bootcamp-day-card {
     border-radius: var(--radius-lg);
     padding: 24px;
     margin: 24px 0;
+    scroll-margin-top: calc(var(--nav-height) + 20px);
 }
 
 .bootcamp-detail-deliverable h3 {

@@ -90,6 +90,37 @@
         margin-left: 0;
         width: 100%;
     }
+
+    /* Bootcamp TOC responsive */
+    .bootcamp-detail-body {
+        flex-direction: column;
+        padding: 0 40px;
+    }
+
+    .bootcamp-toc-mobile-toggle {
+        display: flex;
+    }
+
+    .bootcamp-toc {
+        position: fixed;
+        top: var(--nav-height);
+        left: -260px;
+        width: 260px;
+        min-width: 260px;
+        height: calc(100vh - var(--nav-height));
+        z-index: 900;
+        transition: left 0.3s ease;
+        box-shadow: var(--shadow-xl);
+        background: var(--bg-white);
+    }
+
+    .bootcamp-toc.open {
+        left: 0;
+    }
+
+    .bootcamp-detail-main {
+        padding-left: 0;
+    }
 }
 
 @media (max-width: 1024px) {
@@ -98,6 +129,10 @@
     }
 
     .sidebar-layout {
+        padding: 0 24px;
+    }
+
+    .bootcamp-detail-body {
         padding: 0 24px;
     }
 
@@ -459,6 +494,10 @@
     }
 
     .sidebar-layout {
+        padding: 0 16px;
+    }
+
+    .bootcamp-detail-body {
         padding: 0 16px;
     }
 
