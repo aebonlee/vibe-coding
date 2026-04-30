@@ -1884,6 +1884,16 @@ a.bootcamp-day-card {
     text-align: right;
 }
 
+/* page-header 내부 progress bar 텍스트 흰색 */
+.page-header .progress-bar-label,
+.page-header .progress-bar-percent {
+    color: #fff;
+}
+
+.page-header .progress-bar-track {
+    background: rgba(255, 255, 255, 0.25);
+}
+
 /* ============================================
    Admin Dashboard (basic)
    ============================================ */
