@@ -2,6 +2,7 @@ import { useState, useEffect, type ReactElement, type FormEvent } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import getSupabase, { TABLES } from '../utils/supabase';
+import { md } from '../utils/markdown';
 import type { BoardPost } from '../types';
 
 const CATEGORIES = ['전체', '공지', '자유', '질문', '쇼케이스', '후기'];
@@ -93,7 +94,7 @@ const Community = (): ReactElement => {
               <span>{formatDate(selectedPost.created_at)}</span>
               <span>조회 {selectedPost.views}</span>
             </div>
-            <div className="post-body" dangerouslySetInnerHTML={{ __html: selectedPost.content.replace(/\n/g, '<br/>') }} />
+            <div className="post-body" dangerouslySetInnerHTML={{ __html: md(selectedPost.content) }} />
             {(isAdmin || user?.id === selectedPost.author_id) && (
               <button className="btn btn-danger" onClick={() => handleDelete(selectedPost.id)} style={{ marginTop: '1rem' }}>삭제</button>
             )}

@@ -4,6 +4,7 @@ import CodeBlock from '../components/CodeBlock';
 import LevelBadge from '../components/LevelBadge';
 import { useProgress } from '../contexts/ProgressContext';
 import { useAuth } from '../contexts/AuthContext';
+import { md } from '../utils/markdown';
 import { beginnerProjects } from '../data/projects/beginnerProjects';
 import { intermediateProjects } from '../data/projects/intermediateProjects';
 import { advancedProjects } from '../data/projects/advancedProjects';
@@ -113,7 +114,7 @@ const ProjectDetail = (): ReactElement => {
                   <h2>{step.title}</h2>
                   <p className="topic-description">{step.description}</p>
                 </div>
-                <div className="topic-text" dangerouslySetInnerHTML={{ __html: step.content.replace(/\n/g, '<br/>') }} />
+                <div className="topic-text" dangerouslySetInnerHTML={{ __html: md(step.content) }} />
 
                 {step.tips && step.tips.length > 0 && (
                   <div className="key-points">

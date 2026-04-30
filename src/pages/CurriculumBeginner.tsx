@@ -5,6 +5,7 @@ import LevelBadge from '../components/LevelBadge';
 import { useProgress } from '../contexts/ProgressContext';
 import { useAuth } from '../contexts/AuthContext';
 import { beginnerTopics } from '../data/curriculum/beginnerData';
+import { md } from '../utils/markdown';
 
 const CurriculumBeginner = (): ReactElement => {
   const [activeId, setActiveId] = useState(beginnerTopics[0]?.id || '');
@@ -45,7 +46,7 @@ const CurriculumBeginner = (): ReactElement => {
             {activeTopic.contents.map((content, idx) => (
               <div key={content.id || idx} className="topic-section">
                 <h3>{content.title}</h3>
-                <div className="topic-text" dangerouslySetInnerHTML={{ __html: content.content.replace(/\n/g, '<br/>') }} />
+                <div className="topic-text" dangerouslySetInnerHTML={{ __html: md(content.content) }} />
                 {content.keyPoints && content.keyPoints.length > 0 && (
                   <div className="key-points">
                     <h4>핵심 포인트</h4>

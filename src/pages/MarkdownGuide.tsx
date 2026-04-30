@@ -4,6 +4,7 @@ import CodeBlock from '../components/CodeBlock';
 import { useProgress } from '../contexts/ProgressContext';
 import { useAuth } from '../contexts/AuthContext';
 import { markdownChapters } from '../data/markdownData';
+import { md } from '../utils/markdown';
 
 const MarkdownGuide = (): ReactElement => {
   const [activeId, setActiveId] = useState(markdownChapters[0]?.id || '');
@@ -39,7 +40,7 @@ const MarkdownGuide = (): ReactElement => {
           <div className="topic-content">
             <h2>{activeChapter.title}</h2>
             <p className="topic-description">{activeChapter.description}</p>
-            <div className="topic-text" dangerouslySetInnerHTML={{ __html: activeChapter.content.replace(/\n/g, '<br/>') }} />
+            <div className="topic-text" dangerouslySetInnerHTML={{ __html: md(activeChapter.content) }} />
 
             {activeChapter.examples.map((ex, i) => (
               <div key={i} className="markdown-example">
