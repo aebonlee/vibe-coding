@@ -316,6 +316,16 @@
     margin-bottom: 16px;
 }
 
+.topic-text ul,
+.topic-text ol {
+    padding-left: 24px;
+    margin: 8px 0;
+}
+
+.topic-text li {
+    margin-bottom: 4px;
+}
+
 .topic-text strong {
     color: var(--text-primary);
     font-weight: 600;
@@ -479,8 +489,12 @@
 
 .markdown-rendered ul,
 .markdown-rendered ol {
-    padding-left: 20px;
+    padding-left: 24px;
     margin-bottom: 8px;
+}
+
+.markdown-rendered li {
+    margin-bottom: 4px;
 }
 
 .markdown-rendered table {
@@ -1285,7 +1299,7 @@
 
 .bootcamp-day-tasks ul {
     list-style: disc;
-    padding-left: 18px;
+    padding-left: 24px;
     margin: 0;
 }
 
