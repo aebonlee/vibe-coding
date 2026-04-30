@@ -77,6 +77,13 @@ const ProjectDetail = (): ReactElement => {
       </div>
 
       <div className="container">
+        {project.diagram && (
+          <div className="project-diagram">
+            <h3>아키텍처 / 설계 흐름</h3>
+            <div className="project-diagram-svg" dangerouslySetInnerHTML={{ __html: project.diagram }} />
+          </div>
+        )}
+
         <div className="project-detail-layout">
           <aside className="project-steps-nav">
             <h3>단계 ({project.steps.length})</h3>

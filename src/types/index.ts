@@ -255,6 +255,7 @@ export interface ProjectData {
   level: CurriculumLevel;
   duration: string;
   techStack: string[];
+  diagram?: string;
   steps: ProjectStep[];
   outcomes: string[];
 }
