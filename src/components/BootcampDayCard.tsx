@@ -1,4 +1,5 @@
-import type { ReactElement } from 'react';
+import type { ReactElement, MouseEvent } from 'react';
+import { Link } from 'react-router-dom';
 import type { BootcampDay } from '../types';
 
 interface BootcampDayCardProps {
@@ -24,15 +25,21 @@ const getToolTagClass = (tool: string): string => {
 };
 
 const BootcampDayCard = ({ day, isCompleted, onToggle, isLoggedIn }: BootcampDayCardProps): ReactElement => {
+  const handleToggle = (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onToggle();
+  };
+
   return (
-    <div className={`bootcamp-day-card ${isCompleted ? 'completed' : ''}`}>
+    <Link to={`/bootcamp/day/${day.day}`} className={`bootcamp-day-card ${isCompleted ? 'completed' : ''}`} style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}>
       <div className="bootcamp-day-header">
         <span className="bootcamp-day-number">Day {day.day}</span>
         <span className="bootcamp-day-week">Week {day.week}</span>
         {isLoggedIn && (
           <button
             className={`bootcamp-check-btn ${isCompleted ? 'checked' : ''}`}
-            onClick={onToggle}
+            onClick={handleToggle}
           >
             {isCompleted ? '✓ 완료' : '완료 표시'}
           </button>
@@ -56,7 +63,7 @@ const BootcampDayCard = ({ day, isCompleted, onToggle, isLoggedIn }: BootcampDay
       <div className="bootcamp-day-deliverable">
         <strong>산출물:</strong> {day.deliverable}
       </div>
-    </div>
+    </Link>
   );
 };
 

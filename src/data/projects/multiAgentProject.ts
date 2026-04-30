@@ -322,4 +322,380 @@ const batches = topologicalSort(tasks);
       ],
     },
   ],
+  sourceFiles: [
+    {
+      filename: 'package.json',
+      language: 'json',
+      code: `{
+  "name": "multi-agent-workflow",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}`,
+    },
+    {
+      filename: 'tsconfig.json',
+      language: 'json',
+      code: `{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "declaration": true
+  },
+  "include": ["src"]
+}`,
+    },
+    {
+      filename: 'src/types.ts',
+      language: 'typescript',
+      code: `export type AgentType = 'frontend' | 'backend' | 'test';
+export type TaskStatus = 'pending' | 'running' | 'done' | 'failed';
+
+export interface Task {
+  id: string;
+  type: AgentType;
+  description: string;
+  dependencies: string[];
+  status: TaskStatus;
+  result?: string;
+  error?: string;
+}
+
+export interface AgentResult {
+  taskId: string;
+  success: boolean;
+  output: string;
+  filesChanged: string[];
+  duration: number;
+}
+
+export interface AgentConfig {
+  type: AgentType;
+  systemPrompt: string;
+  maxRetries: number;
+  timeout: number;
+}
+
+export interface OrchestratorConfig {
+  agents: AgentConfig[];
+  maxConcurrency: number;
+  logLevel: 'debug' | 'info' | 'warn' | 'error';
+}`,
+    },
+    {
+      filename: 'src/orchestrator.ts',
+      language: 'typescript',
+      code: `import type { Task, AgentResult, OrchestratorConfig } from './types.js';
+import { WorkerAgent } from './worker.js';
+import { TaskQueue } from './task-queue.js';
+
+export class Orchestrator {
+  private queue: TaskQueue;
+  private workers: Map<string, WorkerAgent> = new Map();
+  private results: AgentResult[] = [];
+
+  constructor(private config: OrchestratorConfig) {
+    this.queue = new TaskQueue();
+    for (const agentCfg of config.agents) {
+      this.workers.set(agentCfg.type, new WorkerAgent(agentCfg));
+    }
+  }
+
+  async decompose(userRequest: string): Promise<Task[]> {
+    // 사용자 요청을 하위 태스크로 분해
+    const tasks: Task[] = [
+      { id: 't1', type: 'backend', description: 'DB 스키마 생성', dependencies: [], status: 'pending' },
+      { id: 't2', type: 'backend', description: 'API 엔드포인트 구현', dependencies: ['t1'], status: 'pending' },
+      { id: 't3', type: 'frontend', description: 'UI 컴포넌트 생성', dependencies: ['t2'], status: 'pending' },
+      { id: 't4', type: 'frontend', description: 'CSS 스타일링', dependencies: [], status: 'pending' },
+      { id: 't5', type: 'test', description: '통합 테스트 작성', dependencies: ['t2', 't3'], status: 'pending' },
+    ];
+    tasks.forEach(t => this.queue.add(t));
+    console.log(\`[Orchestrator] \${tasks.length}개 태스크 분해 완료\`);
+    return tasks;
+  }
+
+  async execute(): Promise<AgentResult[]> {
+    while (this.queue.hasPending()) {
+      const ready = this.queue.getReady();
+      if (ready.length === 0) {
+        await new Promise(r => setTimeout(r, 100));
+        continue;
+      }
+
+      const batch = ready.slice(0, this.config.maxConcurrency);
+      console.log(\`[Orchestrator] 배치 실행: \${batch.map(t => t.id).join(', ')}\`);
+
+      const promises = batch.map(task => this.runWorker(task));
+      const settled = await Promise.allSettled(promises);
+
+      settled.forEach((result, i) => {
+        const task = batch[i];
+        if (result.status === 'fulfilled') {
+          task.status = 'done';
+          task.result = result.value.output;
+          this.results.push(result.value);
+        } else {
+          task.status = 'failed';
+          task.error = String(result.reason);
+        }
+        this.queue.update(task);
+      });
+    }
+
+    return this.results;
+  }
+
+  private async runWorker(task: Task): Promise<AgentResult> {
+    const worker = this.workers.get(task.type);
+    if (!worker) throw new Error(\`Worker not found: \${task.type}\`);
+    task.status = 'running';
+    this.queue.update(task);
+    return worker.execute(task);
+  }
+
+  getStatus() {
+    return {
+      total: this.queue.size(),
+      pending: this.queue.countByStatus('pending'),
+      running: this.queue.countByStatus('running'),
+      done: this.queue.countByStatus('done'),
+      failed: this.queue.countByStatus('failed'),
+    };
+  }
+}`,
+    },
+    {
+      filename: 'src/worker.ts',
+      language: 'typescript',
+      code: `import type { Task, AgentResult, AgentConfig } from './types.js';
+
+export class WorkerAgent {
+  constructor(private config: AgentConfig) {}
+
+  async execute(task: Task): Promise<AgentResult> {
+    const start = Date.now();
+    console.log(\`[\${this.config.type}] 시작: \${task.description}\`);
+
+    let lastError: Error | null = null;
+
+    for (let attempt = 0; attempt <= this.config.maxRetries; attempt++) {
+      try {
+        const output = await this.runWithTimeout(task, this.config.timeout);
+        const duration = Date.now() - start;
+        console.log(\`[\${this.config.type}] 완료: \${task.description} (\${duration}ms)\`);
+        return {
+          taskId: task.id,
+          success: true,
+          output,
+          filesChanged: [],
+          duration,
+        };
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
+        if (attempt < this.config.maxRetries) {
+          const delay = Math.pow(2, attempt) * 1000;
+          console.log(\`[\${this.config.type}] 재시도 \${attempt + 1}/\${this.config.maxRetries} (\${delay}ms 대기)\`);
+          await new Promise(r => setTimeout(r, delay));
+        }
+      }
+    }
+
+    return {
+      taskId: task.id,
+      success: false,
+      output: \`실패: \${lastError?.message}\`,
+      filesChanged: [],
+      duration: Date.now() - start,
+    };
+  }
+
+  private async runWithTimeout(task: Task, timeout: number): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('Timeout')), timeout);
+
+      // 실제 구현에서는 Claude Code Task Tool 호출
+      // 여기서는 시뮬레이션
+      setTimeout(() => {
+        clearTimeout(timer);
+        resolve(\`[\${this.config.type}] \${task.description} 완료\`);
+      }, Math.random() * 2000 + 500);
+    });
+  }
+}`,
+    },
+    {
+      filename: 'src/task-queue.ts',
+      language: 'typescript',
+      code: `import type { Task, TaskStatus } from './types.js';
+
+export class TaskQueue {
+  private tasks: Map<string, Task> = new Map();
+
+  add(task: Task): void {
+    this.tasks.set(task.id, task);
+  }
+
+  update(task: Task): void {
+    this.tasks.set(task.id, task);
+  }
+
+  get(id: string): Task | undefined {
+    return this.tasks.get(id);
+  }
+
+  getReady(): Task[] {
+    return [...this.tasks.values()].filter(t =>
+      t.status === 'pending' &&
+      t.dependencies.every(depId => {
+        const dep = this.tasks.get(depId);
+        return dep?.status === 'done';
+      })
+    );
+  }
+
+  hasPending(): boolean {
+    return [...this.tasks.values()].some(
+      t => t.status === 'pending' || t.status === 'running'
+    );
+  }
+
+  size(): number {
+    return this.tasks.size;
+  }
+
+  countByStatus(status: TaskStatus): number {
+    return [...this.tasks.values()].filter(t => t.status === status).length;
+  }
+
+  getAll(): Task[] {
+    return [...this.tasks.values()];
+  }
+}`,
+    },
+    {
+      filename: 'src/config.ts',
+      language: 'typescript',
+      code: `import type { OrchestratorConfig } from './types.js';
+
+export const defaultConfig: OrchestratorConfig = {
+  maxConcurrency: 3,
+  logLevel: 'info',
+  agents: [
+    {
+      type: 'frontend',
+      systemPrompt: \`당신은 React 프론트엔드 전문가입니다.
+- TypeScript + 함수형 컴포넌트만 사용
+- CSS Modules 또는 Tailwind 사용
+- 모든 컴포넌트에 Props 인터페이스 정의
+- 에러 바운더리 필수 적용\`,
+      maxRetries: 2,
+      timeout: 30000,
+    },
+    {
+      type: 'backend',
+      systemPrompt: \`당신은 Supabase 백엔드 전문가입니다.
+- PostgreSQL + RLS 기반 보안
+- Edge Functions (Deno) 사용
+- 모든 API에 입력 검증 (zod)
+- 에러 응답 형식: { error: string, code: string }\`,
+      maxRetries: 2,
+      timeout: 30000,
+    },
+    {
+      type: 'test',
+      systemPrompt: \`당신은 테스트 엔지니어입니다.
+- Vitest + React Testing Library 사용
+- 유닛 테스트 + 통합 테스트 작성
+- 커버리지 80% 이상 목표
+- 엣지 케이스 반드시 포함\`,
+      maxRetries: 1,
+      timeout: 60000,
+    },
+  ],
+};`,
+    },
+    {
+      filename: 'src/index.ts',
+      language: 'typescript',
+      code: `import { Orchestrator } from './orchestrator.js';
+import { defaultConfig } from './config.js';
+
+async function main() {
+  console.log('=== 멀티에이전트 워크플로우 시작 ===\\n');
+
+  const orchestrator = new Orchestrator(defaultConfig);
+
+  // 1. 태스크 분해
+  const tasks = await orchestrator.decompose(
+    '게시판 CRUD 기능을 만들어줘. 목록, 작성, 수정, 삭제 페이지와 API가 필요해.'
+  );
+  console.log(\`\\n분해된 태스크: \${tasks.length}개\\n\`);
+
+  // 2. 실행
+  const results = await orchestrator.execute();
+
+  // 3. 결과 요약
+  console.log('\\n=== 실행 결과 ===');
+  const status = orchestrator.getStatus();
+  console.log(\`전체: \${status.total} | 완료: \${status.done} | 실패: \${status.failed}\`);
+
+  for (const r of results) {
+    const icon = r.success ? '✓' : '✗';
+    console.log(\`  \${icon} [\${r.taskId}] \${r.output} (\${r.duration}ms)\`);
+  }
+}
+
+main().catch(console.error);`,
+    },
+    {
+      filename: 'CLAUDE.md',
+      language: 'markdown',
+      code: `# Multi-Agent Workflow
+
+## Architecture
+- Pattern: Orchestrator → Worker Agents
+- Agents: Frontend (React), Backend (Supabase), Test (Vitest)
+- Task Queue: In-memory Map with dependency tracking
+
+## Tech Stack
+- Runtime: Node.js 20+ (ESM)
+- Language: TypeScript 5.7+
+- Build: tsc → dist/
+
+## Coding Conventions
+- Functional style preferred, classes for stateful components (Orchestrator, Worker)
+- All async functions must have error handling
+- Use console.log for orchestration logs, console.error for errors
+- File naming: kebab-case.ts
+
+## Agent Rules
+- Frontend Agent: React 19 + TypeScript, functional components only
+- Backend Agent: Supabase + PostgreSQL, RLS required
+- Test Agent: Vitest, coverage > 80%
+
+## Commands
+- \\\`npm run build\\\` — TypeScript 컴파일
+- \\\`npm start\\\` — 실행
+- \\\`npm run dev\\\` — 개발 모드 (watch)`,
+    },
+  ],
 };

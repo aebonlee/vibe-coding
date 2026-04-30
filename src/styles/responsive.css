@@ -304,6 +304,28 @@
         overflow-y: auto;
     }
 
+    /* Source viewer responsive */
+    .source-viewer {
+        flex-direction: column;
+        max-height: none;
+    }
+
+    .source-file-list {
+        width: 100%;
+        min-width: 100%;
+        max-height: 200px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .source-code-panel .code-block-content {
+        min-height: 300px;
+    }
+
+    .source-empty-state {
+        min-height: 300px;
+    }
+
     /* Project outcomes */
     .project-outcomes ul {
         grid-template-columns: 1fr;
@@ -322,6 +344,33 @@
     /* Bootcamp grid */
     .bootcamp-grid {
         grid-template-columns: 1fr;
+    }
+
+    /* Bootcamp detail */
+    .bootcamp-detail-header {
+        padding: 24px 0 20px;
+    }
+
+    .bootcamp-detail-header h1 {
+        font-size: 22px;
+    }
+
+    .bootcamp-day-nav {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .bootcamp-nav-btn {
+        max-width: 100%;
+    }
+
+    .bootcamp-nav-btn.next {
+        text-align: left;
+        margin-left: 0;
+    }
+
+    .bootcamp-nav-list-btn {
+        justify-content: center;
     }
 
     /* Progress stats */

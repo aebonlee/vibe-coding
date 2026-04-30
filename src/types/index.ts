@@ -247,6 +247,12 @@ export interface ProjectStep {
   tips?: string[];
 }
 
+export interface SourceFile {
+  filename: string;   // e.g. "src/App.tsx"
+  language: string;   // e.g. "tsx"
+  code: string;
+}
+
 export interface ProjectData {
   id: string;
   slug: string;
@@ -258,6 +264,7 @@ export interface ProjectData {
   diagram?: string;
   steps: ProjectStep[];
   outcomes: string[];
+  sourceFiles?: SourceFile[];
 }
 
 export interface MarkdownChapter {
@@ -296,6 +303,7 @@ export interface BootcampDay {
   tasks: string[];
   tools: string[];
   deliverable: string;
+  contents: TopicContent[];
 }
 
 export interface ChecklistItem {

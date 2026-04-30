@@ -294,5 +294,310 @@ GitHub에 소스 코드를 공개하고, README에 설치 방법, 설정 예시,
         'README에 claude_desktop_config.json 설정 예시를 포함하면 사용자가 바로 연동할 수 있습니다.'
       ]
     }
-  ]
+  ],
+  sourceFiles: [
+    {
+      filename: 'package.json',
+      language: 'json',
+      code: `{
+  "name": "@example/mcp-server",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "mcp-server": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc && node -e \\"const fs=require('fs');const f='dist/index.js';const c=fs.readFileSync(f,'utf8');fs.writeFileSync(f,'#!/usr/bin/env node\\\\n'+c)\\"",
+    "dev": "tsx watch src/index.ts",
+    "inspect": "npx @modelcontextprotocol/inspector node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}`,
+    },
+    {
+      filename: 'tsconfig.json',
+      language: 'json',
+      code: `{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "declaration": true
+  },
+  "include": ["src"]
+}`,
+    },
+    {
+      filename: 'src/index.ts',
+      language: 'typescript',
+      code: `import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { registerTools } from "./tools.js";
+import { registerResources } from "./resources.js";
+import { registerPrompts } from "./prompts.js";
+
+const server = new McpServer({
+  name: "my-mcp-server",
+  version: "1.0.0",
+  description: "파일 검색, 프로젝트 분석, 코드 리뷰를 지원하는 MCP 서버",
+});
+
+// 기능 등록
+registerTools(server);
+registerResources(server);
+registerPrompts(server);
+
+// 서버 시작
+const transport = new StdioServerTransport();
+await server.connect(transport);
+console.error("MCP 서버가 시작되었습니다.");`,
+    },
+    {
+      filename: 'src/tools.ts',
+      language: 'typescript',
+      code: `import { z } from "zod";
+import { readdir, readFile, stat } from "fs/promises";
+import { join, extname } from "path";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+
+export function registerTools(server: McpServer): void {
+  // Tool 1: 파일 검색
+  server.tool(
+    "search-files",
+    "디렉토리에서 확장자 기준으로 파일을 검색합니다.",
+    {
+      directory: z.string().describe("검색할 디렉토리 경로"),
+      extension: z.string().describe("파일 확장자 (예: .ts, .tsx)"),
+      maxResults: z.number().optional().default(20).describe("최대 결과 수"),
+    },
+    async ({ directory, extension, maxResults }) => {
+      try {
+        const files = await findFiles(directory, extension, maxResults);
+        return {
+          content: [{
+            type: "text" as const,
+            text: JSON.stringify(files, null, 2),
+          }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text" as const, text: \`오류: \${error}\` }],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // Tool 2: 파일 통계
+  server.tool(
+    "file-stats",
+    "디렉토리의 파일 통계를 반환합니다.",
+    {
+      directory: z.string().describe("분석할 디렉토리 경로"),
+    },
+    async ({ directory }) => {
+      try {
+        const stats = await getDirectoryStats(directory);
+        return {
+          content: [{
+            type: "text" as const,
+            text: JSON.stringify(stats, null, 2),
+          }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text" as const, text: \`오류: \${error}\` }],
+          isError: true,
+        };
+      }
+    }
+  );
+}
+
+async function findFiles(dir: string, ext: string, max: number): Promise<string[]> {
+  const results: string[] = [];
+  const entries = await readdir(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (results.length >= max) break;
+    const fullPath = join(dir, entry.name);
+    if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules') {
+      results.push(...await findFiles(fullPath, ext, max - results.length));
+    } else if (entry.isFile() && extname(entry.name) === ext) {
+      results.push(fullPath);
+    }
+  }
+  return results;
+}
+
+async function getDirectoryStats(dir: string) {
+  const counts: Record<string, number> = {};
+  let totalSize = 0;
+  const entries = await readdir(dir, { withFileTypes: true, recursive: true });
+  for (const entry of entries) {
+    if (!entry.isFile()) continue;
+    const ext = extname(entry.name) || '(no ext)';
+    counts[ext] = (counts[ext] ?? 0) + 1;
+    try {
+      const s = await stat(join(dir, entry.name));
+      totalSize += s.size;
+    } catch { /* skip */ }
+  }
+  return { filesByExtension: counts, totalFiles: Object.values(counts).reduce((a, b) => a + b, 0), totalSizeKB: Math.round(totalSize / 1024) };
+}`,
+    },
+    {
+      filename: 'src/resources.ts',
+      language: 'typescript',
+      code: `import { readFile } from "fs/promises";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+
+export function registerResources(server: McpServer): void {
+  // Resource: 프로젝트 설정
+  server.resource(
+    "project-config",
+    "config://project",
+    { description: "현재 프로젝트의 package.json 정보를 반환합니다." },
+    async (uri) => {
+      try {
+        const pkg = await readFile("package.json", "utf-8");
+        return {
+          contents: [{
+            uri: uri.href,
+            mimeType: "application/json",
+            text: pkg,
+          }],
+        };
+      } catch {
+        return {
+          contents: [{
+            uri: uri.href,
+            mimeType: "text/plain",
+            text: "package.json을 찾을 수 없습니다.",
+          }],
+        };
+      }
+    }
+  );
+
+  // Resource: README
+  server.resource(
+    "readme",
+    "docs://readme",
+    { description: "프로젝트 README 내용을 반환합니다." },
+    async (uri) => {
+      try {
+        const readme = await readFile("README.md", "utf-8");
+        return {
+          contents: [{
+            uri: uri.href,
+            mimeType: "text/markdown",
+            text: readme,
+          }],
+        };
+      } catch {
+        return {
+          contents: [{
+            uri: uri.href,
+            mimeType: "text/plain",
+            text: "README.md를 찾을 수 없습니다.",
+          }],
+        };
+      }
+    }
+  );
+}`,
+    },
+    {
+      filename: 'src/prompts.ts',
+      language: 'typescript',
+      code: `import { z } from "zod";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+
+export function registerPrompts(server: McpServer): void {
+  // Prompt: 코드 리뷰
+  server.prompt(
+    "code-review",
+    "코드 리뷰를 수행하는 프롬프트 템플릿입니다.",
+    {
+      language: z.string().describe("프로그래밍 언어"),
+      focus: z.string().optional().describe("리뷰 초점 (performance, security, readability)"),
+    },
+    ({ language, focus }) => ({
+      messages: [{
+        role: "user" as const,
+        content: {
+          type: "text" as const,
+          text: \`다음 \${language} 코드를 리뷰해주세요.
+\${focus ? \`특히 \${focus}에 집중해서 리뷰해주세요.\` : ''}
+
+리뷰 형식:
+1. 전체 평가 (A/B/C/D)
+2. 잘한 점
+3. 개선할 점 (구체적인 코드 예시 포함)
+4. 보안 이슈 (있다면)
+5. 성능 최적화 제안 (있다면)\`,
+        },
+      }],
+    })
+  );
+
+  // Prompt: 버그 분석
+  server.prompt(
+    "debug-helper",
+    "에러 메시지를 분석하고 해결책을 제안합니다.",
+    {
+      errorMessage: z.string().describe("에러 메시지"),
+      context: z.string().optional().describe("에러 발생 맥락"),
+    },
+    ({ errorMessage, context }) => ({
+      messages: [{
+        role: "user" as const,
+        content: {
+          type: "text" as const,
+          text: \`에러가 발생했습니다. 분석해주세요.
+
+에러 메시지:
+\\\`\\\`\\\`
+\${errorMessage}
+\\\`\\\`\\\`
+
+\${context ? \`맥락: \${context}\` : ''}
+
+분석 형식:
+1. 에러 원인
+2. 해결 방법 (코드 예시)
+3. 재발 방지 방법\`,
+        },
+      }],
+    })
+  );
+}`,
+    },
+    {
+      filename: 'claude_desktop_config.json',
+      language: 'json',
+      code: `{
+  "mcpServers": {
+    "my-mcp-server": {
+      "command": "node",
+      "args": ["C:/projects/my-mcp-server/dist/index.js"],
+      "env": {}
+    }
+  }
+}`,
+    },
+  ],
 };

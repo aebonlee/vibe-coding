@@ -33,6 +33,7 @@ const ProjectDetail = lazy(() => import('../pages/ProjectDetail'));
 // Tools, Bootcamp, Checklist
 const ToolComparison = lazy(() => import('../pages/ToolComparison'));
 const Bootcamp = lazy(() => import('../pages/Bootcamp'));
+const BootcampDayDetail = lazy(() => import('../pages/BootcampDayDetail'));
 const Checklist = lazy(() => import('../pages/Checklist'));
 
 // Community
@@ -84,6 +85,7 @@ const PublicLayout = (): ReactElement => {
             {/* Tools, Bootcamp, Checklist */}
             <Route path="/tools" element={<ToolComparison />} />
             <Route path="/bootcamp" element={<Bootcamp />} />
+            <Route path="/bootcamp/day/:day" element={<BootcampDayDetail />} />
             <Route path="/checklist" element={<Checklist />} />
 
             {/* Community */}

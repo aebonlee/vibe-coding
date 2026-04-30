@@ -326,4 +326,530 @@ Spec-Driven 개발의 궁극적 목표는 "명세를 바꾸면 앱이 바뀐다"
       ],
     },
   ],
+  sourceFiles: [
+    {
+      filename: 'docs/PRD.md',
+      language: 'markdown',
+      code: `# PRD: 태스크 매니저
+
+## 1. 개요
+- **목표**: 개인/팀 태스크 관리 웹앱
+- **타깃 사용자**: 소규모 팀, 프리랜서
+- **성공 지표**: 일일 활성 사용자 100명
+
+## 2. 기능 명세
+### F-001: 회원가입/로그인
+- 이메일/비밀번호 로그인
+- **수용 기준**:
+  - [ ] 이메일 형식 검증
+  - [ ] 비밀번호 8자 이상
+  - [ ] 로그인 후 대시보드 리다이렉트
+
+### F-002: 태스크 CRUD
+- 태스크 생성, 조회, 수정, 삭제
+- **수용 기준**:
+  - [ ] 제목 필수, 설명 선택
+  - [ ] 상태: todo, in_progress, done
+  - [ ] 본인 태스크만 수정/삭제
+
+### F-003: 대시보드
+- 태스크 통계 시각화
+- **수용 기준**:
+  - [ ] 상태별 태스크 수 표시
+  - [ ] 최근 7일 완료 추이 차트
+
+## 3. 비기능 요구사항
+- 응답 시간 < 500ms (p95)
+- 모바일 반응형 필수
+- Lighthouse 성능 > 85`,
+    },
+    {
+      filename: 'docs/spec/data-model.md',
+      language: 'markdown',
+      code: `# 데이터 모델 명세
+
+## tasks 테이블
+| 컬럼 | 타입 | 제약 | 기본값 |
+|------|------|------|--------|
+| id | uuid | PK | gen_random_uuid() |
+| user_id | uuid | FK(auth.users), NOT NULL | auth.uid() |
+| title | text | NOT NULL | - |
+| description | text | - | NULL |
+| status | text | CHECK(todo,in_progress,done) | 'todo' |
+| priority | int | NOT NULL | 0 |
+| created_at | timestamptz | - | now() |
+| updated_at | timestamptz | - | now() |
+
+## RLS 정책
+- SELECT: auth.uid() = user_id
+- INSERT: auth.uid() = user_id
+- UPDATE: auth.uid() = user_id
+- DELETE: auth.uid() = user_id`,
+    },
+    {
+      filename: 'supabase/migrations/001_create_tasks.sql',
+      language: 'sql',
+      code: `-- 001_create_tasks.sql
+
+create table if not exists public.tasks (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null default auth.uid(),
+  title      text not null,
+  description text,
+  status     text not null default 'todo'
+             check (status in ('todo','in_progress','done')),
+  priority   int  not null default 0,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- Indexes
+create index idx_tasks_user on public.tasks(user_id);
+create index idx_tasks_status on public.tasks(user_id, status);
+
+-- RLS
+alter table public.tasks enable row level security;
+
+create policy "Users read own tasks"
+  on public.tasks for select
+  using (auth.uid() = user_id);
+
+create policy "Users insert own tasks"
+  on public.tasks for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users update own tasks"
+  on public.tasks for update
+  using (auth.uid() = user_id);
+
+create policy "Users delete own tasks"
+  on public.tasks for delete
+  using (auth.uid() = user_id);
+
+-- Updated_at trigger
+create or replace function update_updated_at()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger tasks_updated_at
+  before update on public.tasks
+  for each row execute function update_updated_at();`,
+    },
+    {
+      filename: 'package.json',
+      language: 'json',
+      code: `{
+  "name": "spec-driven-task-manager",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.0.0",
+    "@supabase/supabase-js": "^2.49.0",
+    "recharts": "^2.15.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.5.0",
+    "typescript": "^5.7.0",
+    "vite": "^6.3.0",
+    "vitest": "^3.1.0",
+    "@testing-library/react": "^16.0.0"
+  }
+}`,
+    },
+    {
+      filename: 'src/lib/supabase.ts',
+      language: 'typescript',
+      code: `import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);`,
+    },
+    {
+      filename: 'src/types.ts',
+      language: 'typescript',
+      code: `export type TaskStatus = 'todo' | 'in_progress' | 'done';
+
+export interface Task {
+  id: string;
+  user_id: string;
+  title: string;
+  description: string | null;
+  status: TaskStatus;
+  priority: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TaskInput {
+  title: string;
+  description?: string;
+  status?: TaskStatus;
+  priority?: number;
+}
+
+export interface DashboardStats {
+  total: number;
+  todo: number;
+  inProgress: number;
+  done: number;
+  weeklyCompleted: { date: string; count: number }[];
+}`,
+    },
+    {
+      filename: 'src/App.tsx',
+      language: 'tsx',
+      code: `import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import Header from './components/Header';
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
+import TasksPage from './pages/TasksPage';
+import './App.css';
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="loading">로딩 중...</div>;
+  if (!user) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <Header />
+        <main className="main-content">
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute><DashboardPage /></ProtectedRoute>
+            } />
+            <Route path="/tasks" element={
+              <ProtectedRoute><TasksPage /></ProtectedRoute>
+            } />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </main>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}`,
+    },
+    {
+      filename: 'src/contexts/AuthContext.tsx',
+      language: 'tsx',
+      code: `import { createContext, useContext, useEffect, useState } from 'react';
+import type { User } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
+
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user ?? null);
+      setLoading(false);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+  };
+
+  const signUp = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) throw error;
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  return ctx;
+}`,
+    },
+    {
+      filename: 'src/hooks/useTasks.ts',
+      language: 'typescript',
+      code: `import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '../lib/supabase';
+import type { Task, TaskInput } from '../types';
+
+export function useTasks() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchTasks = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) setError(error.message);
+    else setTasks(data ?? []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchTasks(); }, [fetchTasks]);
+
+  const createTask = async (input: TaskInput) => {
+    const { error } = await supabase.from('tasks').insert(input);
+    if (error) throw error;
+    await fetchTasks();
+  };
+
+  const updateTask = async (id: string, input: Partial<TaskInput>) => {
+    const { error } = await supabase.from('tasks').update(input).eq('id', id);
+    if (error) throw error;
+    await fetchTasks();
+  };
+
+  const deleteTask = async (id: string) => {
+    const { error } = await supabase.from('tasks').delete().eq('id', id);
+    if (error) throw error;
+    await fetchTasks();
+  };
+
+  return { tasks, loading, error, createTask, updateTask, deleteTask, refetch: fetchTasks };
+}`,
+    },
+    {
+      filename: 'src/pages/TasksPage.tsx',
+      language: 'tsx',
+      code: `/* spec: F-002 */
+import { useState } from 'react';
+import { useTasks } from '../hooks/useTasks';
+import type { TaskStatus } from '../types';
+
+export default function TasksPage() {
+  const { tasks, loading, createTask, updateTask, deleteTask } = useTasks();
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [filter, setFilter] = useState<TaskStatus | 'all'>('all');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) return;
+    await createTask({ title: title.trim(), description: description.trim() || undefined });
+    setTitle('');
+    setDescription('');
+  };
+
+  const filtered = filter === 'all' ? tasks : tasks.filter(t => t.status === filter);
+
+  if (loading) return <div className="loading">로딩 중...</div>;
+
+  return (
+    <div className="container">
+      <h1>태스크 관리</h1>
+
+      <form onSubmit={handleSubmit} className="task-form">
+        <input value={title} onChange={e => setTitle(e.target.value)} placeholder="태스크 제목" required />
+        <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="설명 (선택)" />
+        <button type="submit">추가</button>
+      </form>
+
+      <div className="filter-bar">
+        {(['all', 'todo', 'in_progress', 'done'] as const).map(f => (
+          <button key={f} className={filter === f ? 'active' : ''} onClick={() => setFilter(f)}>
+            {f === 'all' ? '전체' : f === 'todo' ? '할 일' : f === 'in_progress' ? '진행 중' : '완료'}
+          </button>
+        ))}
+      </div>
+
+      <ul className="task-list">
+        {filtered.map(task => (
+          <li key={task.id} className={\`task-item status-\${task.status}\`}>
+            <div className="task-info">
+              <h3>{task.title}</h3>
+              {task.description && <p>{task.description}</p>}
+            </div>
+            <div className="task-actions">
+              <select value={task.status} onChange={e => updateTask(task.id, { status: e.target.value as TaskStatus })}>
+                <option value="todo">할 일</option>
+                <option value="in_progress">진행 중</option>
+                <option value="done">완료</option>
+              </select>
+              <button onClick={() => deleteTask(task.id)} className="btn-delete">삭제</button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}`,
+    },
+    {
+      filename: 'src/pages/DashboardPage.tsx',
+      language: 'tsx',
+      code: `/* spec: F-003 */
+import { useMemo } from 'react';
+import { useTasks } from '../hooks/useTasks';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import type { DashboardStats } from '../types';
+
+export default function DashboardPage() {
+  const { tasks, loading } = useTasks();
+
+  const stats: DashboardStats = useMemo(() => {
+    const todo = tasks.filter(t => t.status === 'todo').length;
+    const inProgress = tasks.filter(t => t.status === 'in_progress').length;
+    const done = tasks.filter(t => t.status === 'done').length;
+
+    // 최근 7일 완료 추이
+    const now = new Date();
+    const weeklyCompleted = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(now);
+      date.setDate(date.getDate() - (6 - i));
+      const dateStr = date.toISOString().slice(0, 10);
+      const count = tasks.filter(t =>
+        t.status === 'done' && t.updated_at.slice(0, 10) === dateStr
+      ).length;
+      return { date: dateStr.slice(5), count };
+    });
+
+    return { total: tasks.length, todo, inProgress, done, weeklyCompleted };
+  }, [tasks]);
+
+  if (loading) return <div className="loading">로딩 중...</div>;
+
+  return (
+    <div className="container">
+      <h1>대시보드</h1>
+
+      <div className="stats-grid">
+        <div className="stat-card"><h3>{stats.total}</h3><p>전체</p></div>
+        <div className="stat-card"><h3>{stats.todo}</h3><p>할 일</p></div>
+        <div className="stat-card"><h3>{stats.inProgress}</h3><p>진행 중</p></div>
+        <div className="stat-card done"><h3>{stats.done}</h3><p>완료</p></div>
+      </div>
+
+      <div className="chart-section">
+        <h2>최근 7일 완료 추이</h2>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={stats.weeklyCompleted}>
+            <XAxis dataKey="date" />
+            <YAxis allowDecimals={false} />
+            <Tooltip />
+            <Bar dataKey="count" fill="#0046C8" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}`,
+    },
+    {
+      filename: '.github/workflows/deploy.yml',
+      language: 'yaml',
+      code: `name: Build & Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx tsc --noEmit
+        name: Type Check
+
+      - run: npx vitest run --reporter=verbose
+        name: Test
+
+      - run: npm run build
+        env:
+          VITE_SUPABASE_URL: \${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: \${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: \${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist`,
+    },
+    {
+      filename: 'CLAUDE.md',
+      language: 'markdown',
+      code: `# Spec-Driven Task Manager
+
+## Architecture
+- Frontend: React 19 + TypeScript + Vite
+- Backend: Supabase (PostgreSQL + Auth + RLS)
+- CI/CD: GitHub Actions → GitHub Pages
+- Charts: Recharts
+
+## Spec Files
+- PRD: docs/PRD.md
+- Data Model: docs/spec/data-model.md
+- Migrations: supabase/migrations/
+
+## Conventions
+- 모든 컴포넌트에 \\\`/* spec: F-xxx */\\\` 주석으로 명세 ID 기록
+- RLS 정책 필수 — auth.uid() = user_id 패턴
+- 에러 응답: { error: string, code: string }
+- 테스트 커버리지 80% 이상 목표
+
+## Commands
+- \\\`npm run dev\\\` — 개발 서버
+- \\\`npm run build\\\` — 프로덕션 빌드
+- \\\`npm test\\\` — 테스트 실행
+- \\\`npm run lint\\\` — 타입 체크`,
+    },
+  ],
 };
