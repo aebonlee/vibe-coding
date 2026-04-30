@@ -14,7 +14,7 @@ export const mcpServerProject: ProjectData = {
     '커스텀 MCP 서버 개발 및 배포',
     'Claude Code 확장 능력'
   ],
-  diagram: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 360" font-family="'Noto Sans KR', sans-serif">
+  diagram: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 370" font-family="'Noto Sans KR', sans-serif">
   <defs>
     <marker id="ah" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
       <polygon points="0 0, 10 3.5, 0 7" fill="#0046C8"/>
@@ -35,22 +35,22 @@ export const mcpServerProject: ProjectData = {
   <!-- MCP Server -->
   <rect x="495" y="60" width="150" height="60" rx="8" fill="#0046C8" stroke="#0046C8" stroke-width="2"/>
   <text x="570" y="96" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">MCP Server</text>
-  <!-- Down arrows from Server -->
-  <line x1="510" y1="120" x2="510" y2="200" stroke="#0046C8" stroke-width="2" marker-end="url(#ah)"/>
-  <line x1="570" y1="120" x2="570" y2="200" stroke="#0046C8" stroke-width="2" marker-end="url(#ah)"/>
-  <line x1="630" y1="120" x2="630" y2="200" stroke="#0046C8" stroke-width="2" marker-end="url(#ah)"/>
+  <!-- Down arrows from Server (angled to spaced boxes) -->
+  <line x1="530" y1="120" x2="440" y2="205" stroke="#0046C8" stroke-width="2" marker-end="url(#ah)"/>
+  <line x1="570" y1="120" x2="570" y2="205" stroke="#0046C8" stroke-width="2" marker-end="url(#ah)"/>
+  <line x1="610" y1="120" x2="700" y2="205" stroke="#0046C8" stroke-width="2" marker-end="url(#ah)"/>
   <!-- Tools -->
-  <rect x="460" y="205" width="100" height="50" rx="8" fill="#F0F4FF" stroke="#0046C8" stroke-width="2"/>
-  <text x="510" y="235" text-anchor="middle" font-size="14" font-weight="bold" fill="#0046C8">Tools</text>
+  <rect x="375" y="210" width="130" height="50" rx="8" fill="#F0F4FF" stroke="#0046C8" stroke-width="2"/>
+  <text x="440" y="240" text-anchor="middle" font-size="14" font-weight="bold" fill="#0046C8">Tools</text>
   <!-- Resources -->
-  <rect x="520" y="205" width="100" height="50" rx="8" fill="#F0F4FF" stroke="#0046C8" stroke-width="2"/>
-  <text x="570" y="235" text-anchor="middle" font-size="14" font-weight="bold" fill="#0046C8">Resources</text>
+  <rect x="520" y="210" width="100" height="50" rx="8" fill="#F0F4FF" stroke="#0046C8" stroke-width="2"/>
+  <text x="570" y="240" text-anchor="middle" font-size="14" font-weight="bold" fill="#0046C8">Resources</text>
   <!-- Prompts -->
-  <rect x="580" y="205" width="100" height="50" rx="8" fill="#F0F4FF" stroke="#0046C8" stroke-width="2"/>
-  <text x="630" y="235" text-anchor="middle" font-size="14" font-weight="bold" fill="#0046C8">Prompts</text>
+  <rect x="635" y="210" width="130" height="50" rx="8" fill="#F0F4FF" stroke="#0046C8" stroke-width="2"/>
+  <text x="700" y="240" text-anchor="middle" font-size="14" font-weight="bold" fill="#0046C8">Prompts</text>
   <!-- Legend -->
-  <text x="380" y="310" text-anchor="middle" font-size="12" fill="#666">MCP = Model Context Protocol | AI가 외부 도구와 데이터에 접근하는 표준 프로토콜</text>
-  <text x="380" y="335" text-anchor="middle" font-size="11" fill="#999">Transport: stdio (로컬) 또는 SSE (원격)</text>
+  <text x="400" y="310" text-anchor="middle" font-size="12" fill="#666">MCP = Model Context Protocol | AI가 외부 도구와 데이터에 접근하는 표준 프로토콜</text>
+  <text x="400" y="335" text-anchor="middle" font-size="11" fill="#999">Transport: stdio (로컬) 또는 SSE (원격)</text>
 </svg>`,
   steps: [
     {
