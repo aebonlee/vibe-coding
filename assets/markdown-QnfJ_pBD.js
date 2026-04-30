@@ -1,0 +1,3 @@
+function a(l){const r=l.split(`
+`),e=[];let n=!1,s=!1;const o=()=>{n&&(e.push("</ul>"),n=!1),s&&(e.push("</ol>"),s=!1)};for(const f of r){const t=f.trimEnd(),u=t.match(/^- (.+)/);if(u){s&&(e.push("</ol>"),s=!1),n||(e.push("<ul>"),n=!0),e.push(`<li>${i(u[1])}</li>`);continue}const c=t.match(/^(\d+)\.\s+(.+)/);if(c){n&&(e.push("</ul>"),n=!1),s||(e.push("<ol>"),s=!0),e.push(`<li>${i(c[2])}</li>`);continue}if(o(),t.trim()===""){e.push("<br/>");continue}e.push(i(t)+"<br/>")}return o(),e.join(`
+`)}function i(l){return l.replace(/\*\*\*(.+?)\*\*\*/g,"<strong><em>$1</em></strong>").replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\*(.+?)\*/g,"<em>$1</em>").replace(/`(.+?)`/g,"<code>$1</code>")}export{a as m};
